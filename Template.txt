@@ -1,0 +1,599 @@
+class DisjointUnionSets {
+            int[] size;
+            int[] parent;
+            int n;
+
+            public DisjointUnionSets(int n) {
+                size = new int[n];
+                parent = new int[n];
+                this.n = n;
+                makeSet();
+            }
+
+            void makeSet() {
+                for (int i = 0; i < n; i++) {
+                    parent[i] = i;
+                    size[i] = 1;
+                }
+            }
+
+            int find(int x) {
+                if (parent[x] != x) {
+                    parent[x] = find(parent[x]);
+                }
+                return parent[x];
+            }
+
+            void union(int x, int y) {
+                int xRoot = find(x), yRoot = find(y);
+                if (xRoot == yRoot) {
+                    return;
+                }
+                if (size[xRoot] < size[yRoot]) {
+                    parent[xRoot] = yRoot;
+                    size[yRoot] += size[xRoot];
+                } else if (size[yRoot] < size[xRoot]) {
+                    parent[yRoot] = xRoot;
+                    size[xRoot] += size[yRoot];
+                } else {
+                    parent[yRoot] = xRoot;
+                    size[xRoot] += size[yRoot];
+                }
+            }
+        }
+
+class SegmenTree {
+            int n;
+            int[] tree;
+ 
+            void build(int[] arr) {
+                n = arr.length;
+                tree = new int[2 * n + 1];
+                for (int i = 0; i < n; i++)
+                    tree[n + i] = arr[i];
+                for (int i = n - 1; i > 0; --i)
+                    tree[i] =tree[i << 1]+tree[i << 1 | 1];
+            }
+            void updateTreeNode(int p, int value)  {  
+                tree[p+n] = value; 
+                p = p+n;  
+                for (int i=p; i > 1; i >>= 1) 
+                    tree[i>>1] =tree[i] + tree[i^1]; 
+            } 
+
+
+            int query(int l, int r) {
+                int res = 0;
+                for (l += n, r += n; l < r;
+                     l >>= 1, r >>= 1) {
+                    if ((l & 1) > 0)
+                        res+= tree[l++];
+ 
+                    if ((r & 1) > 0)
+                        res+= tree[--r];
+                }
+ 
+                return res;
+            }
+ 
+        }
+
+class Segment_Tree {
+        int MAXN=1000001;
+        long INF = (long) 1e18 + 1;
+        long[] tree = new long[4*MAXN];
+        long[] lazy = new long[4*MAXN];
+ 
+        void init() {
+            Arrays.fill(tree, INF);
+            Arrays.fill(lazy, INF);
+        }
+        void update(int i,int j,int n,int val){
+            update_tree(1,0,n-1,i,j,val);
+
+        }
+        void update_tree(int node, int a, int b, int i, int j, int value) {
+            if (lazy[node] != INF) {
+                if(tree[node] == INF)
+                    tree[node] = 0;
+                tree[node] += lazy[node];
+                if (a != b) {
+                    if(lazy[node * 2] == INF)
+                        lazy[node * 2] = 0;
+                    if(lazy[node * 2 + 1] == INF)
+                        lazy[node * 2 + 1] = 0;
+                    lazy[node * 2] += lazy[node];
+                    lazy[node * 2 + 1] += lazy[node];
+                }
+                lazy[node] = INF;
+            }
+            if (a > b || a > j || b < i)
+                return;
+            if (a >= i && b <= j) {
+                if(tree[node] == INF)
+                    tree[node] = 0;
+                tree[node] += value;
+                if (a != b) {
+                    if(lazy[node * 2] == INF)
+                        lazy[node * 2] = 0;
+                    if(lazy[node * 2 + 1] == INF)
+                        lazy[node * 2 + 1] = 0;
+                    lazy[node * 2] += value;
+                    lazy[node * 2 + 1] += value;
+                }
+                return;
+            }
+            update_tree(node * 2, a, (a + b) / 2, i, j, value);
+            update_tree(1 + node * 2, 1 + (a + b) / 2, b, i, j, value);
+            tree[node] = Math.min(tree[node * 2], tree[node * 2 + 1]);
+        }
+ 
+        long query_tree(int node, int a, int b, int i, int j) {
+            if (a > b || a > j || b < i) return INF;
+            if (lazy[node] != INF) {
+                if(tree[node] == INF)
+                    tree[node] = 0;
+                tree[node] += lazy[node];
+                if (a != b) {
+                    if(lazy[node * 2] == INF)
+                        lazy[node * 2] = 0;
+                    if(lazy[node * 2 + 1] == INF)
+                        lazy[node * 2 + 1] = 0;
+                    lazy[node * 2] += lazy[node];
+                    lazy[node * 2 + 1] += lazy[node];
+                }
+                lazy[node] = INF;
+            }
+            if (a >= i && b <= j)
+                return tree[node];
+ 
+            long q1 = query_tree(node * 2, a, (a + b) / 2, i, j);
+            long q2 = query_tree(1 + node * 2, 1 + (a + b) / 2, b, i, j);
+            long res = Math.min(q1, q2);
+            return res;
+        }
+        long query(int i,int j,int n){
+            return query_tree(1,0,n-1,i,j);
+        }
+
+ 
+    }
+
+class RU_RQ{
+    long[] BIT1 ;
+    long[] BIT2 ;
+    int n;
+    RU_RQ(int v){
+        n=v;
+        BIT1 = new long[n + 1];
+        BIT2 = new long[n + 1];
+    }
+    long getSum(long BITree[], int index) {
+            index += 1;
+            long sum = 0;
+            while (index > 0) {
+                sum += BITree[index];
+                index -= index & (-index);
+            }
+            return sum;
+        }
+    void updateBIT(long BITree[], int index, int val) {
+            index = index + 1;
+            while (index <= n) {
+                BITree[index] += val;
+                index += index & (-index);
+            }
+        }
+
+        long sum(int x) {
+            return (getSum(BIT1, x) * x) - getSum(BIT2, x);
+        }
+
+        void updateRange(int val, int l, int r) {
+            updateBIT(BIT1, l, val);
+            updateBIT(BIT1, r + 1, -val);
+            updateBIT(BIT2, l, val * (l - 1));
+            updateBIT(BIT2, r + 1, -val * r);
+        }
+
+        long rangeSum(int l, int r) {
+            return sum(r) - sum(l - 1);
+        }
+}
+
+
+//Segmented Sieve
+public void solve(int testNumber, InputReader in, PrintWriter out) {
+            int t, i, j, tt, k;
+            this.out = out;
+            this.in = in;
+            n = (int) 1e6;//Maximum Difference
+            long a = in.nextLong();
+            long b = in.nextLong();
+            int size = (int) (b - a + 1);
+            long num[] = new long[size];
+            for (i = 0; i < size; i++) {
+                num[i] = a + i;
+            }
+
+            boolean vis[] = new boolean[n];
+            long tot[] = new long[size];
+            Arrays.fill(tot, 1);
+            long mn[] = new long[size];
+            Arrays.fill(mn, Long.MAX_VALUE);
+            for (i = 2; i < n; i++) {
+                if (vis[i])
+                    continue;
+                for (j = i + i; j < n; j += i) {
+                    vis[j] = true;
+                }
+                for (long jj = ((a - 1) / i + 1); jj * i <= b; jj++) {
+                    long c = 1;
+                    int ind = (int) (jj * i - a);
+                    while (num[ind] % i == 0) {
+                        c++;
+                        num[ind] /= i;
+                    }
+                    tot[ind] *= c;
+                    mn[ind] = Math.min(mn[ind], c);
+                }
+            }
+            for (i = 0; i < size; i++) {
+                if (num[i] > 1) {
+                    tot[i] *= 2;
+                    mn[i] = Math.min(mn[i], 2);
+                }
+            }
+            long ss = 0;
+            for (i = 0; i < size; i++) {
+                long ff = tot[i];
+                long yp = ff / (mn[i]) * (mn[i] - 1);
+                ss += ff - yp;
+            }
+            pn(ss);
+        }
+
+
+//Dikshtra
+
+final Comparator<node> com1 = new Comparator<node>() {
+            public int compare(node x, node y) {
+                return Long.compare(x.w, y.w);
+            }
+        };
+public void solve(int testNumber, InputReader in, PrintWriter out) {
+            int t, i, j, tt, k;
+            this.out = out;
+            this.in = in;
+            n = in.nextInt();
+            int m = in.nextInt();
+            ArrayList<Graph> gr[] = new ArrayList[n];
+            for (i = 0; i < n; i++) {
+                gr[i] = new ArrayList<>();
+            }
+            for (i = 0; i < m; i++) {
+                int x = in.nextInt() - 1;
+                int y = in.nextInt() - 1;
+                long w = in.nextLong();
+                gr[x].add(new Graph(y, w));
+                gr[y].add(new Graph(x, w));
+            }
+            PriorityQueue<node> pq = new PriorityQueue<node>(com1);
+            long dist[] = new long[n];
+            Arrays.fill(dist, Integer.MAX_VALUE * (long) 999999);
+            int b = in.nextInt();
+      //Insert Here the multiple sources in priority queue
+            for (i = 0; i < b; i++) {
+                int x = in.nextInt() - 1;
+                dist[x] = 0;
+                pq.add(new node(x, 0));
+            }
+            while (!pq.isEmpty()) {
+                node f = pq.poll();
+                int u = f.x;
+                for (Graph it : gr[u]) {
+                    int v = it.x;
+                    long wt = it.w;
+                    if (dist[v] > dist[u] + wt) {
+                        dist[v] = dist[u] + wt;
+                        pq.add(new node(v, dist[v]));
+                    }
+                }
+            }
+            for (i = 0; i < n; i++) {
+                pn(dist[i]);
+            }
+        }
+class node {
+            int x;
+            long w;
+
+            node(int a, long b) {
+                x = a;
+                w = b;
+            }
+
+        }
+
+        class Graph {
+            int x;
+            long w;
+
+            Graph(int a, long c) {
+                x = a;
+                w = c;
+            }
+
+        }
+
+//Floyd Warshal
+n = in.nextInt();
+            int m = in.nextInt();
+            long floyd[][] = new long[n][n];
+            for (i = 0; i < n; i++) {
+                Arrays.fill(floyd[i], Integer.MAX_VALUE * (long) 100000000);
+                floyd[i][i] = 0;
+            }
+            for (i = 0; i < m; i++) {
+                int x = in.nextInt() - 1;
+                int y = in.nextInt() - 1;
+                long wt = in.nextLong();
+                floyd[x][y] = wt;
+                floyd[y][x] = wt;
+            }
+            for (k = 0; k < n; k++) {
+                for (i = 0; i < n; i++) {
+                    for (j = 0; j < n; j++) {
+                        floyd[i][j] = Math.min(floyd[i][j], floyd[i][k] + floyd[k][j]);
+                    }
+                }
+            }
+
+//Floyd for negative edge
+for (int k = 0; k < n; ++k) {
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (d[i][k] < INF && d[k][j] < INF)
+                d[i][j] = min(d[i][j], d[i][k] + d[k][j]); 
+        }
+    }
+}
+
+//LCA
+    int lgN = 22;
+    int[] tin, tout;
+    int[][] anc;
+    int timer;
+    int[] lvl;
+    void dfs(int v, int p) {
+        lvl[v]=lvl[p]+1;
+        anc[0][v] = p;
+        int i = 0;
+        tin[v] = timer++;
+        for (i = 1; i < lgN; i++)
+            anc[i][v] = anc[i - 1][anc[i - 1][v]];
+        for (Integer z : tree[v]) {
+            int u = z;
+            if (u != p) {
+                dfs(u, v);
+            }
+        }
+        tout[v] = timer++;
+    }
+    PrintWriter out;
+     InputReader in;
+    public void solve(int testNumber, InputReader in, PrintWriter out) {
+        int t, i, j, tt, k;
+        this.out=out;
+        this.in=in;
+        anc = new int[lgN][n];
+        timer = 0;
+        tin = new int[n];
+        tout = new int[n];
+        lvl=new int[n];
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < lgN; j++)
+                anc[i][j] = -1;
+        }
+
+    }
+
+    int getAncestor(int u, int dis) {
+        dis = lvl[u] - dis;
+        int i, lg = 0;
+        for (; (1 << lg) <= lvl[u]; lg++) ;
+        lg--;
+
+        for (i = lg; i >= 0; i--) {
+            if (lvl[u] - (1 << i) >= dis)
+                u = anc[u][i];
+        }
+
+        return u;
+    }
+
+    boolean is_ancestor(int u, int v) {
+        return tin[u] <= tin[v] && tout[u] >= tout[v];
+    }
+
+    int lca_of(int u, int v) {
+        if (is_ancestor(u, v))
+            return u;
+        if (is_ancestor(v, u))
+            return v;
+        int i = 0;
+        for (i = lgN - 1; i >= 0; i--) {
+            if (!is_ancestor(anc[i][u], v))
+                u = anc[i][u];
+        }
+        return anc[0][u];
+    }
+
+//Bellman Ford
+
+public void solve(int testNumber, InputReader in, PrintWriter out) {
+        int t, i, j, tt, k;
+        this.out=out;
+        this.in=in;
+        dis=new long[N];
+        graph=new int[N][3];
+        V=in.nextInt();
+        E=in.nextInt();
+        for (i = 0; i < E; i++) {
+            int x, y, w;
+            x=in.nextInt();
+            y=in.nextInt();
+            w=in.nextInt();
+            graph[i][0] = x;
+            graph[i][1] = y;
+            graph[i][2] = w;
+        }
+
+        bellmanford(0);
+
+        for (i = 0; i < V; i++)
+            pn(dis[i]);
+    }
+
+    int N = 1000005;
+    int V, E;
+    long[] dis;
+    int[][] graph; // src->dist weight
+    long BINF= 1000000000000001l;
+    void bellmanford(int src) {
+
+        for (int i = 0; i < V; i++)
+            dis[i] = BINF;
+        dis[src] = 0;
+
+        for (int i = 0; i < V - 1; i++) {
+            for (int j = 0; j < E; j++) {
+                if (dis[graph[j][0]] + graph[j][2] < dis[graph[j][1]])
+                    dis[graph[j][1]] = dis[graph[j][0]] + graph[j][2];
+            }
+        }
+        for (int i = 0; i < E; i++) {
+            int x = graph[i][0];
+            int y = graph[i][1];
+            int weight = graph[i][2];
+            if (dis[x] != BINF && dis[ x]+weight < dis[y])
+            pn("Graph contains negative weight cycle");
+        }
+    }
+
+//Euler Totient 
+is equal to n multiplied by product of (1 – 1/p) for all prime factors p of n. For example value of ?(6) = 6 * (1-1/2) * (1 – 1/3) = 2
+
+//Spf
+    int MAXN = 100001;
+    int spf[] = new int[MAXN];
+
+    void sieve() {
+        spf[1] = 1;
+        for (int i = 2; i < MAXN; i++)
+            spf[i] = i;
+        for (int i = 4; i < MAXN; i += 2)
+            spf[i] = 2;
+        for (int i = 3; i * i < MAXN; i++) {
+            if (spf[i] == i) {
+                for (int j = i * i; j < MAXN; j += i)
+                    if (spf[j] == j)
+                        spf[j] = i;
+            }
+        }
+    }
+
+    Vector<Integer> getFactorization(int x) {
+        Vector<Integer> ret = new Vector<>();
+        while (x != 1) {
+            ret.add(spf[x]);
+            x = x / spf[x];
+        }
+        return ret;
+    }
+
+//nCr
+long[] fact, ifact;
+
+void process(){
+
+    fact[0] = 1;
+    for(int i = 1; i < n; i++)
+        fact[i] = (fact[i - 1] * i) % mm;
+    for(int i = 0; i < n; i++)
+        ifact[i] = power(fact[i], mm - 2, mm);
+}
+
+long nCr(int n, int r){
+    if(r > n) return 0;
+    if(r == n) return 1;
+    long ans = (ifact[n - r] * ifact[r]) % mm;
+    ans = (ans * fact[n]) % mm;
+    return ans;
+}
+
+//SCC (For toposort reverse the order array)
+ArrayList<Integer>[] gr, g;
+ArrayList<Integer> order;
+boolean[] used;
+int grp = 0;
+ArrayList<Integer>[] cmp;
+int[] par;
+
+gr = new ArrayList[n];
+g = new ArrayList[n];
+order = new ArrayList();
+for (i = 0; i <= n; i++) {
+    gr[i] = new ArrayList();
+    g[i] = new ArrayList();
+}
+for (i = 0; i < m; i++) {
+                int x = Integer.parseInt(in.next())-1;
+                int y = Integer.parseInt(in.next())-1;
+                g[x].add(y);
+                gr[y].add(x);
+            }
+used = new boolean[n + 1];
+            int cc = 0;
+            for (i = 1; i <= n; i++) {
+                if (!used[i]) {
+                    dfs1(i);
+                    cc++;
+                }
+            }
+            Arrays.fill(used, false);
+par = new int[n + 1];
+            cmp = new ArrayList[n + 1];
+            for (i = 0; i <= n; i++) {
+                cmp[i] = new ArrayList();
+            }
+            grp = 1;
+            for (i = 0; i < n; ++i) {
+                int v = order.get(n - 1 - i);
+                if (!used[v]) {
+                    dfs2(v);
+                    grp++;
+                }
+            }
+            Arrays.fill(used, false);
+void dfs2(int v) {
+        used[v] = true;
+        cmp[grp].add(v);
+        par[v] = grp;
+        for (Integer it : gr[v]) {
+            if (!used[it]) {
+                dfs2(it);
+            }
+        }
+    }
+
+void dfs1(int v) {
+        used[v] = true;
+        for (Integer it : g[v]) {
+            if (!used[it]) {
+                dfs1(it);
+            }
+        }
+        order.add(v);
+    }
+

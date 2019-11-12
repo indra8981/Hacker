@@ -1,0 +1,275 @@
+import java.io.OutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.ArrayList;
+import java.io.InputStream;
+
+/**
+ * Built using CHelper plug-in
+ * Actual solution is at the top
+ *
+ * @author Indrajit Sinha
+ */
+public class Main {
+	public static void main(String[] args) {
+		InputStream inputStream = System.in;
+		OutputStream outputStream = System.out;
+		InputReader in = new InputReader(inputStream);
+		PrintWriter out = new PrintWriter(outputStream);
+		Task1 solver = new Task1();
+		solver.solve(1, in, out);
+		out.close();
+	}
+
+	static class Task1 {
+		int n;
+		ArrayList<Integer>[] tree;
+		ArrayList<Long>[] sum;
+		ArrayList<Integer>[] tree1;
+		PrintWriter out;
+		InputReader in;
+		int[] a;
+		Entity[] en;
+		final Comparator<Entity> com = new Comparator<Entity>() {
+			public int compare(Entity x, Entity y) {
+				int xx = Integer.compare(x.a, y.a);
+				if (xx == 0) {
+					return Integer.compare(x.b, y.b);
+				} else {
+					return xx;
+				}
+			}
+		};
+
+		public void solve(int testNumber, InputReader in, PrintWriter out) {
+			int t, i, j, tt, k;
+			this.out = out;
+			this.in = in;
+			n = in.nextInt();
+			a = new int[n];
+			en = new Entity[n];
+			for (i = 0; i < n; i++) {
+				a[i] = in.nextInt();
+				en[i] = new Entity(a[i], i);
+			}
+			Arrays.sort(en, com);
+			tree = new ArrayList[4 * n];
+			sum = new ArrayList[4 * n];
+			tree1 = new ArrayList[4 * n];
+			for (i = 0; i < 4 * n; i++) {
+				tree[i] = new ArrayList<>();
+				sum[i] = new ArrayList<>();
+				tree1[i] = new ArrayList<>();
+			}
+			build1(0, 0, n - 1);
+			build(0, 0, n - 1);
+			int q = in.nextInt();
+			for (i = 0; i < q; i++) {
+				int l = in.nextInt() - 1;
+				int r = in.nextInt() - 1;
+				long y = in.nextLong();
+				int lo = 1;
+				int hi = (r - l + 1);
+				long ans = -1;
+				while (lo <= hi) {
+					int mid = (lo + hi) / 2;
+					int up = query1(0, 0, n - 1, l, r, mid);
+					int ou = a[up];
+					long hp = query(0, 0, n - 1, l, r, ou);
+					if (hp >= y) {
+						hi = mid - 1;
+						ans = hp;
+					} else
+						lo = mid + 1;
+				}
+				pn(ans);
+			}
+		}
+
+		long query(int node, int start, int end, int ss, int se, int k) {
+			if (ss > end || start > se)
+				return 0;
+			if (ss <= start && se >= end) {
+				int lo = 0;
+				int hi = tree[node].size() - 1;
+				while (lo <= hi) {
+					int mid = (lo + hi) / 2;
+					if (tree[node].get(mid) <= k) {
+						lo = mid + 1;
+					} else
+						hi = mid - 1;
+				}
+				lo--;
+				if (lo >= 0)
+					return sum[node].get(lo);
+				else
+					return 0l;
+			}
+			int mid = (start + end) / 2;
+			long x1 = query(2 * node + 1, start, mid, ss, se, k);
+			long x2 = query(2 * node + 2, mid + 1, end, ss, se, k);
+			return x1 + x2;
+		}
+
+		void build(int node, int ss, int se) {
+			if (ss == se) {
+				tree[node].add(a[ss]);
+				sum[node].add((long) a[ss]);
+				return;
+			}
+			int mid = (ss + se) / 2;
+			build(2 * node + 1, ss, mid);
+			build(2 * node + 2, mid + 1, se);
+			merge1(tree, node, 2 * node + 1, 2 * node + 2);
+			if (tree[node].size() > 0) {
+				sum[node].add((long) tree[node].get(0));
+				for (int i = 1; i < tree[node].size(); i++) {
+					sum[node].add(sum[node].get(i - 1) + tree[node].get(i));
+				}
+			}
+		}
+
+		int query1(int n, int b, int e, int i, int j, int k) {
+			if (b == e) {
+				return tree1[n].get(0);
+			}
+			int l = n * 2 + 1, r = l + 1, mid = (b + e) / 2;
+			int x = 0;
+			int lo = 0;
+			int hi = tree1[l].size() - 1;
+			int p1 = 0, p2 = 0;
+			while (lo <= hi) {
+				int m = (lo + hi) / 2;
+				if (tree1[l].get(m) <= j)
+					lo = m + 1;
+				else
+					hi = m - 1;
+			}
+			p1 = lo;
+			lo = 0;
+			hi = tree1[l].size() - 1;
+			while (lo <= hi) {
+				int m = (lo + hi) / 2;
+				if (tree1[l].get(m) <= (i - 1))
+					lo = m + 1;
+				else
+					hi = m - 1;
+			}
+			p2 = lo;
+			x = (p1 - p2);
+			if (x >= k) {
+				return query1(l, b, mid, i, j, k);
+			} else
+				return query1(r, mid + 1, e, i, j, k - x);
+		}
+
+		void build1(int node, int ss, int se) {
+			if (ss == se) {
+				tree1[node].add(en[ss].b);
+				return;
+			}
+			int mid = (ss + se) / 2;
+			build1(2 * node + 1, ss, mid);
+			build1(2 * node + 2, mid + 1, se);
+			merge1(tree1, node, 2 * node + 1, 2 * node + 2);
+		}
+
+		void merge1(ArrayList<Integer>[] tree1, int node, int left, int right) {
+			int i = 0, j = 0;
+			while (i < tree1[left].size() && j < tree1[right].size()) {
+				if (tree1[left].get(i) <= tree1[right].get(j)) {
+					tree1[node].add(tree1[left].get(i));
+					i++;
+				} else {
+					tree1[node].add(tree1[right].get(j));
+					j++;
+				}
+			}
+			while (i < tree1[left].size()) {
+				tree1[node].add(tree1[left].get(i));
+				i++;
+			}
+			while (j < tree1[right].size()) {
+				tree1[node].add(tree1[right].get(j));
+				j++;
+			}
+		}
+
+		void pn(long zx) {
+			out.println(zx);
+		}
+
+		class Entity {
+			int a;
+			int b;
+
+			Entity(int p, int q) {
+				a = p;
+				b = q;
+			}
+
+		}
+
+	}
+
+	static class InputReader {
+		private InputStream stream;
+		private byte[] buf = new byte[1024];
+		private int curChar;
+		private int numChars;
+
+		public InputReader(InputStream stream) {
+			this.stream = stream;
+		}
+
+		public int read() {
+			if (numChars == -1) {
+				throw new UnknownError();
+			}
+			if (curChar >= numChars) {
+				curChar = 0;
+				try {
+					numChars = stream.read(buf);
+				} catch (IOException e) {
+					throw new UnknownError();
+				}
+				if (numChars <= 0) {
+					return -1;
+				}
+			}
+			return buf[curChar++];
+		}
+
+		public int nextInt() {
+			return Integer.parseInt(next());
+		}
+
+		public long nextLong() {
+			return Long.parseLong(next());
+		}
+
+		public String next() {
+			int c = read();
+			while (isSpaceChar(c)) {
+				c = read();
+			}
+			StringBuffer res = new StringBuffer();
+			do {
+				res.appendCodePoint(c);
+				c = read();
+			} while (!isSpaceChar(c));
+
+			return res.toString();
+		}
+
+		private boolean isSpaceChar(int c) {
+			return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == -1;
+		}
+
+	}
+}
+
