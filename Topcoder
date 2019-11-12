@@ -1,0 +1,74 @@
+package %package%;
+import java.util.*;
+import java.io.*;
+public class %TaskClass% {
+    int mm = 1000000007;
+        int n;
+        ArrayList<Integer>[] tree;
+        boolean[] vis;
+    public %Signature% {
+        int t, i, j, tt, k;
+        return %DefaultValue%;
+    }
+    void initT(int n) {
+        		vis = new boolean[n];
+        		tree = new ArrayList[n];
+        		for (int i = 0; i < n; i++) {
+        			tree[i] = new ArrayList<>();
+        		}
+        	}
+
+        	class hog {
+        		char ch;
+        	}
+
+        	final Comparator<Entity> com = new Comparator<Entity>() {
+        		public int compare(Entity x, Entity y) {
+        			int xx = Integer.compare(x.a, y.a);
+        			if (xx == 0) {
+        				return Long.compare(y.c, x.c);
+        			} else {
+        				return xx;
+        			}
+        		}
+        	};
+
+        	class Pair {
+
+        		double a, b, c;
+
+        		Pair(double x, double y, double z) {
+        			a = x;
+        			b = y;
+        			c = z;
+        		}
+        	}
+
+        	class Entity {
+
+        		int a;
+        		int c;
+
+        		Entity(int p, int q) {
+        			a = p;
+        			c = q;
+        		}
+        	}
+
+        	long gcd(long a, long b) {
+        		return (b == 0) ? a : gcd(b, a % b);
+        	}
+
+        	int gcdi(int a, int b) {
+        		return (b == 0) ? a : gcdi(b, a % b);
+        	}
+
+        	long power(long x, int y, int m) {
+        		if (y == 0) {
+        			return 1;
+        		}
+        		long p = power(x, y / 2, m) % m;
+        		p = (p * p) % m;
+        		return (y % 2 == 0) ? p : (x * p) % m;
+        	}
+}
