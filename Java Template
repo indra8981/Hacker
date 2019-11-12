@@ -1,0 +1,129 @@
+package %package%;
+import java.util.*;
+import java.io.*;
+import %InputClassFQN%;
+import %OutputClassFQN%;
+public class %TaskClass% {
+    int mm = 1000000007;
+    int n;
+    ArrayList<Integer>[] tree;
+    boolean[] vis;
+    %OutputClass% out;
+     %InputClass% in;
+    public void solve(int testNumber, %InputClass% in, %OutputClass% out) {
+        int t, i, j, tt, k;
+        this.out=out;
+        this.in=in;
+
+    }
+    int ni(){
+    return in.nextInt();
+    }
+    long nl(){
+     return in.nextLong();
+     }
+     double nd(){
+     return in.nextDouble();
+     }
+    void pn(int zx){
+        out.println(zx);
+    }
+    void pn(long zx){
+        out.println(zx);
+     }
+     void pn(String zx){
+        out.println(zx);
+     }
+     void p(int zx){
+        out.print(zx+" ");
+     }
+     void p(long zx){
+        out.print(zx+" ");
+     }
+     void p(String zx){
+        out.print(zx+" ");
+     }
+    void initT(int n) {
+    		vis = new boolean[n];
+    		tree = new ArrayList[n];
+    		for (int i = 0; i < n; i++) {
+    			tree[i] = new ArrayList<>();
+    		}
+    	}
+    	void tadd(int x,int y){
+            	    tree[x].add(y);
+            	    tree[y].add(x);
+        	    }
+    	class hog {
+    		char ch;
+    	}
+
+    	final Comparator<Entity> com = new Comparator<Entity>() {
+    		public int compare(Entity x, Entity y) {
+    			int xx = Integer.compare(x.a, y.a);
+    			if (xx == 0) {
+    				return Integer.compare(x.b, y.b);
+    			} else {
+    				return xx;
+    			}
+    		}
+    	};
+
+    	void sort(int a[]){
+        			PriorityQueue<Integer> pq=new PriorityQueue<>();
+        			for(int i=0;i<a.length;i++){
+        				pq.add(a[i]);
+        			}
+        			for(int i=0;i<a.length;i++){
+        				a[i]=pq.poll();
+        			}
+        		}
+
+        void sort(long a[]){
+        			PriorityQueue<Long> pq=new PriorityQueue<>();
+        			for(int i=0;i<a.length;i++){
+        				pq.add(a[i]);
+        			}
+        			for(int i=0;i<a.length;i++){
+        				a[i]=pq.poll();
+        			}
+        		}
+    	class Pair {
+
+    		int a, b, c;
+
+    		Pair(int x, int y, int z) {
+    			a = x;
+    			b = y;
+    			c = z;
+    		}
+    	}
+
+    	class Entity {
+
+    		int a;
+    		int b;
+
+    		Entity(int p, int q) {
+    			a = p;
+    			b = q;
+    		}
+    	}
+
+    	long gcd(long a, long b) {
+    		return (b == 0) ? a : gcd(b, a % b);
+    	}
+
+    	int gcdi(int a, int b) {
+    		return (b == 0) ? a : gcdi(b, a % b);
+    	}
+
+    	long power(long x, int y, int m) {
+    		if (y == 0) {
+    			return 1;
+    		}
+    		long p = power(x, y / 2, m) % m;
+    		p = (p * p) % m;
+    		return (y % 2 == 0) ? p : (x * p) % m;
+    	}
+}
