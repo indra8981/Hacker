@@ -1,0 +1,21 @@
+﻿Declaration Files
+Challenge Name: “Jessie's Design Month Dash - Round 1 Heat 4”
+https://www.topcoder.com/challenges/30090203
+
+
+Notes
+* My design was based on branding guidelines provided in the challenge
+
+Fonts:
+1. Times New Roman-Native Font of Html.
+
+2. Topcoder Fonts.
+
+
+Stock Arts
+1. Stock Art Name: cute caterpillar cartoon 587156897
+Stock Art URL: https://image.shutterstock.com/image-vector/cute-caterpillar-cartoon-450w-587156897.jpg
+
+
+1. Stock Art Name: opened notepad pencil pen top 450w 405175273
+Stock Art URL: https://image.shutterstock.com/image-vector/opened-notepad-pencil-pen-top-450w-405175273.jpg
